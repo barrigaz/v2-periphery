@@ -1,5 +1,5 @@
-pragma solidity >=0.6.2;
-pragma experimental ABIEncoderV2;
+// SPDX-License-Identifier: GPL-3.0-only
+pragma solidity >=0.8.0;
 
 import './IUniswapV2Router01.sol';
 

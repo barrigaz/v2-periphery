@@ -1,11 +1,9 @@
-pragma solidity >=0.5.0;
+// SPDX-License-Identifier: GPL-3.0-only
+pragma solidity >=0.8.0;
 
 import '../../../v2-core/contracts/interfaces/IUniswapV2Pair.sol';
 
-import "./SafeMath.sol";
-
 library UniswapV2Library {
-    using SafeMath for uint;
 
     uint private constant FEE_SWAP_PRECISION = 10**5;
 
@@ -26,12 +24,12 @@ library UniswapV2Library {
     // calculates the CREATE2 address for a pair without making any external calls
     function pairFor(address factory, address tokenA, address tokenB, uint120 feeSwap) internal pure returns (address pair) {
         (tokenA, tokenB) = sortTokens(tokenA, tokenB);
-        pair = address(uint(keccak256(abi.encodePacked(
+        pair = address(uint160(uint(keccak256(abi.encodePacked(
                 hex'ff',
                 factory,
                 keccak256(abi.encodePacked(tokenA, tokenB, feeSwap)),
                 hex'0d00300382b498ba254abc75b8316fbc536c0aea12ac70820996a951da929c74' // init code hash
-            ))));
+            )))));
     }
 
     // fetches and sorts the reserves for a pair
@@ -45,16 +43,16 @@ library UniswapV2Library {
     function quote(uint amountA, uint reserveA, uint reserveB) internal pure returns (uint amountB) {
         require(amountA > 0, 'UniswapV2Library: INSUFFICIENT_AMOUNT');
         require(reserveA > 0 && reserveB > 0, 'UniswapV2Library: INSUFFICIENT_LIQUIDITY');
-        amountB = amountA.mul(reserveB) / reserveA;
+        amountB = amountA * reserveB / reserveA;
     }
 
     // given an input amount of an asset and pair reserves, returns the maximum output amount of the other asset
     function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut, uint120 feeSwap) internal pure returns (uint amountOut) {
         require(amountIn > 0, 'UniswapV2Library: INSUFFICIENT_INPUT_AMOUNT');
         require(reserveIn > 0 && reserveOut > 0, 'UniswapV2Library: INSUFFICIENT_LIQUIDITY');
-        uint amountInWithFee = amountIn.mul(FEE_SWAP_PRECISION.sub(feeSwap));
-        uint numerator = amountInWithFee.mul(reserveOut);
-        uint denominator = reserveIn.mul(FEE_SWAP_PRECISION).add(amountInWithFee);
+        uint amountInWithFee = amountIn * (FEE_SWAP_PRECISION - feeSwap);
+        uint numerator = amountInWithFee * reserveOut;
+        uint denominator = reserveIn * FEE_SWAP_PRECISION + amountInWithFee;
         amountOut = numerator / denominator;
     }
 
@@ -62,9 +60,9 @@ library UniswapV2Library {
     function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut, uint120 feeSwap) internal pure returns (uint amountIn) {
         require(amountOut > 0, 'UniswapV2Library: INSUFFICIENT_OUTPUT_AMOUNT');
         require(reserveIn > 0 && reserveOut > 0, 'UniswapV2Library: INSUFFICIENT_LIQUIDITY');
-        uint numerator = reserveIn.mul(amountOut).mul(FEE_SWAP_PRECISION);
-        uint denominator = reserveOut.sub(amountOut).mul(FEE_SWAP_PRECISION.sub(feeSwap));
-        amountIn = (numerator / denominator).add(1);
+        uint numerator = reserveIn * amountOut * FEE_SWAP_PRECISION;
+        uint denominator = (reserveOut - amountOut) * (FEE_SWAP_PRECISION - feeSwap);
+        amountIn = (numerator / denominator) + 1;
     }
 
     // performs chained getAmountOut calculations on any number of pairs
