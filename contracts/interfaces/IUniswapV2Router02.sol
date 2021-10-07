@@ -6,7 +6,7 @@ import './IUniswapV2Router01.sol';
 interface IUniswapV2Router02 is IUniswapV2Router01 {
     function removeLiquidityETHSupportingFeeOnTransferTokens(
         address token,
-        uint120 feeSwap,
+        uint feeSwap,
         uint liquidity,
         uint amountTokenMin,
         uint amountETHMin,
@@ -15,7 +15,7 @@ interface IUniswapV2Router02 is IUniswapV2Router01 {
     ) external returns (uint amountETH);
     function removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(
         address token,
-        uint120 feeSwap,
+        uint feeSwap,
         uint liquidity,
         uint amountTokenMin,
         uint amountETHMin,

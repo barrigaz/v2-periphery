@@ -22,21 +22,22 @@ library UniswapV2Library {
     }
 
     // calculates the CREATE2 address for a pair without making any external calls
-    function pairFor(address factory, address tokenA, address tokenB, uint120 feeSwap) internal pure returns (address pair) {
+    function pairFor(address factory, address tokenA, address tokenB, uint feeSwap) internal pure returns (address pair) {
         (tokenA, tokenB) = sortTokens(tokenA, tokenB);
         pair = address(uint160(uint(keccak256(abi.encodePacked(
                 hex'ff',
                 factory,
                 keccak256(abi.encodePacked(tokenA, tokenB, feeSwap)),
-                hex'0d00300382b498ba254abc75b8316fbc536c0aea12ac70820996a951da929c74' // init code hash
+                hex'0d00300382b498ba254abc75b8316fbc536c0aea12ac70820996a951da929c74', // init code hash
+                tokenA, tokenB, feeSwap
             )))));
     }
 
     // fetches and sorts the reserves for a pair
-    function getReserves(address factory, address tokenA, address tokenB, uint120 feeSwap) internal view returns (uint reserveA, uint reserveB) {
+    function getReserves(address factory, address tokenA, address tokenB, uint feeSwap) internal view returns (uint reserveA, uint reserveB) {
         (address token0,) = sortTokens(tokenA, tokenB);
-        IUniswapV2Pair.ReservesSlot memory reservesSlot = IUniswapV2Pair(pairFor(factory, tokenA, tokenB, feeSwap)).getReserves();
-        (reserveA, reserveB) = tokenA == token0 ? (reservesSlot.reserve0, reservesSlot.reserve1) : (reservesSlot.reserve1, reservesSlot.reserve0);
+        IUniswapV2Pair.Reserves memory reserves = IUniswapV2Pair(pairFor(factory, tokenA, tokenB, feeSwap)).getReserves();
+        (reserveA, reserveB) = tokenA == token0 ? (reserves.reserve0, reserves.reserve1) : (reserves.reserve1, reserves.reserve0);
     }
 
     // given some amount of an asset and pair reserves, returns an equivalent amount of the other asset
@@ -47,7 +48,7 @@ library UniswapV2Library {
     }
 
     // given an input amount of an asset and pair reserves, returns the maximum output amount of the other asset
-    function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut, uint120 feeSwap) internal pure returns (uint amountOut) {
+    function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut, uint feeSwap) internal pure returns (uint amountOut) {
         require(amountIn > 0, 'UniswapV2Library: INSUFFICIENT_INPUT_AMOUNT');
         require(reserveIn > 0 && reserveOut > 0, 'UniswapV2Library: INSUFFICIENT_LIQUIDITY');
         uint amountInWithFee = amountIn * (FEE_SWAP_PRECISION - feeSwap);
@@ -57,7 +58,7 @@ library UniswapV2Library {
     }
 
     // given an output amount of an asset and pair reserves, returns a required input amount of the other asset
-    function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut, uint120 feeSwap) internal pure returns (uint amountIn) {
+    function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut, uint feeSwap) internal pure returns (uint amountIn) {
         require(amountOut > 0, 'UniswapV2Library: INSUFFICIENT_OUTPUT_AMOUNT');
         require(reserveIn > 0 && reserveOut > 0, 'UniswapV2Library: INSUFFICIENT_LIQUIDITY');
         uint numerator = reserveIn * amountOut * FEE_SWAP_PRECISION;

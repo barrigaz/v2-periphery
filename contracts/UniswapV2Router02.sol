@@ -32,7 +32,7 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
     function _addLiquidity(
         address tokenA,
         address tokenB,
-        uint120 feeSwap,
+        uint feeSwap,
         uint amountADesired,
         uint amountBDesired,
         uint amountAMin,
@@ -61,7 +61,7 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
     function addLiquidity(
         address tokenA,
         address tokenB,
-        uint120 feeSwap,
+        uint feeSwap,
         uint amountADesired,
         uint amountBDesired,
         uint amountAMin,
@@ -77,7 +77,7 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
     }
     function addLiquidityETH(
         address token,
-        uint120 feeSwap,
+        uint feeSwap,
         uint amountTokenDesired,
         uint amountTokenMin,
         uint amountETHMin,
@@ -106,7 +106,7 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
     function removeLiquidity(
         address tokenA,
         address tokenB,
-        uint120 feeSwap,
+        uint feeSwap,
         uint liquidity,
         uint amountAMin,
         uint amountBMin,
@@ -123,7 +123,7 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
     }
     function removeLiquidityETH(
         address token,
-        uint120 feeSwap,
+        uint feeSwap,
         uint liquidity,
         uint amountTokenMin,
         uint amountETHMin,
@@ -147,7 +147,7 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
     function removeLiquidityWithPermit(
         address tokenA,
         address tokenB,
-        uint120 feeSwap,
+        uint feeSwap,
         uint liquidity,
         uint amountAMin,
         uint amountBMin,
@@ -162,7 +162,7 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
     }
     function removeLiquidityETHWithPermit(
         address token,
-        uint120 feeSwap,
+        uint feeSwap,
         uint liquidity,
         uint amountTokenMin,
         uint amountETHMin,
@@ -179,7 +179,7 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
     // **** REMOVE LIQUIDITY (supporting fee-on-transfer tokens) ****
     function removeLiquidityETHSupportingFeeOnTransferTokens(
         address token,
-        uint120 feeSwap,
+        uint feeSwap,
         uint liquidity,
         uint amountTokenMin,
         uint amountETHMin,
@@ -202,7 +202,7 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
     }
     function removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(
         address token,
-        uint120 feeSwap,
+        uint feeSwap,
         uint liquidity,
         uint amountTokenMin,
         uint amountETHMin,
@@ -335,8 +335,8 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
             uint amountInput;
             uint amountOutput;
             { // scope to avoid stack too deep errors
-            IUniswapV2Pair.ReservesSlot memory reservesSlot = pair.getReserves();
-            (uint reserveInput, uint reserveOutput) = path[i].tokenIn == token0 ? (reservesSlot.reserve0, reservesSlot.reserve1) : (reservesSlot.reserve1, reservesSlot.reserve0);
+            IUniswapV2Pair.Reserves memory reserves = pair.getReserves();
+            (uint reserveInput, uint reserveOutput) = path[i].tokenIn == token0 ? (reserves.reserve0, reserves.reserve1) : (reserves.reserve1, reserves.reserve0);
             amountInput = IERC20(path[i].tokenIn).balanceOf(address(pair)) - reserveInput;
             amountOutput = UniswapV2Library.getAmountOut(amountInput, reserveInput, reserveOutput, path[i].feeSwap);
             }
@@ -413,7 +413,7 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
         return UniswapV2Library.quote(amountA, reserveA, reserveB);
     }
 
-    function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut, uint120 feeSwap)
+    function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut, uint feeSwap)
         public
         pure
         virtual
@@ -423,7 +423,7 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
         return UniswapV2Library.getAmountOut(amountIn, reserveIn, reserveOut, feeSwap);
     }
 
-    function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut, uint120 feeSwap)
+    function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut, uint feeSwap)
         public
         pure
         virtual

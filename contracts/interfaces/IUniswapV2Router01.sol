@@ -10,7 +10,7 @@ interface IUniswapV2Router01 {
     function addLiquidity(
         address tokenA,
         address tokenB,
-        uint120 feeSwap,
+        uint feeSwap,
         uint amountADesired,
         uint amountBDesired,
         uint amountAMin,
@@ -20,7 +20,7 @@ interface IUniswapV2Router01 {
     ) external returns (uint amountA, uint amountB, uint liquidity);
     function addLiquidityETH(
         address token,
-        uint120 feeSwap,
+        uint feeSwap,
         uint amountTokenDesired,
         uint amountTokenMin,
         uint amountETHMin,
@@ -30,7 +30,7 @@ interface IUniswapV2Router01 {
     function removeLiquidity(
         address tokenA,
         address tokenB,
-        uint120 feeSwap,
+        uint feeSwap,
         uint liquidity,
         uint amountAMin,
         uint amountBMin,
@@ -39,7 +39,7 @@ interface IUniswapV2Router01 {
     ) external returns (uint amountA, uint amountB);
     function removeLiquidityETH(
         address token,
-        uint120 feeSwap,
+        uint feeSwap,
         uint liquidity,
         uint amountTokenMin,
         uint amountETHMin,
@@ -56,7 +56,7 @@ interface IUniswapV2Router01 {
     function removeLiquidityWithPermit(
         address tokenA,
         address tokenB,
-        uint120 feeSwap,
+        uint feeSwap,
         uint liquidity,
         uint amountAMin,
         uint amountBMin,
@@ -66,7 +66,7 @@ interface IUniswapV2Router01 {
     ) external returns (uint amountA, uint amountB);
     function removeLiquidityETHWithPermit(
         address token,
-        uint120 feeSwap,
+        uint feeSwap,
         uint liquidity,
         uint amountTokenMin,
         uint amountETHMin,
@@ -104,8 +104,8 @@ interface IUniswapV2Router01 {
         returns (uint[] memory amounts);
 
     function quote(uint amountA, uint reserveA, uint reserveB) external pure returns (uint amountB);
-    function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut, uint120 feeSwap) external pure returns (uint amountOut);
-    function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut, uint120 feeSwap) external pure returns (uint amountIn);
+    function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut, uint feeSwap) external pure returns (uint amountOut);
+    function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut, uint feeSwap) external pure returns (uint amountIn);
     function getAmountsOut(uint amountIn, UniswapV2Library.Path[] calldata path) external view returns (uint[] memory amounts);
     function getAmountsIn(uint amountOut, UniswapV2Library.Path[] calldata path) external view returns (uint[] memory amounts);
 }
