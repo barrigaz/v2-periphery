@@ -2,16 +2,12 @@
 pragma solidity >=0.8.0;
 
 import '../../../v2-core/contracts/interfaces/IUniswapV2Pair.sol';
+import './Path.sol';
 
 library UniswapV2Library {
+    using Path for bytes;
 
     uint private constant FEE_SWAP_PRECISION = 10**5;
-
-    struct Path {
-        address tokenIn;
-        address tokenOut;
-        uint120 feeSwap;
-    }
 
     // returns sorted token addresses, used to handle return values from pairs sorted in this order
     function sortTokens(address tokenA, address tokenB) internal pure returns (address, address) {
@@ -28,7 +24,7 @@ library UniswapV2Library {
                 hex'ff',
                 factory,
                 keccak256(abi.encodePacked(tokenA, tokenB, feeSwap)),
-                hex'0d00300382b498ba254abc75b8316fbc536c0aea12ac70820996a951da929c74', // init code hash
+                hex'63471c26c400f7b7a9bc1a3519bf27e4e23f210060985e0594d6319066d64480', // init code hash
                 tokenA, tokenB, feeSwap
             )))));
     }
@@ -67,22 +63,28 @@ library UniswapV2Library {
     }
 
     // performs chained getAmountOut calculations on any number of pairs
-    function getAmountsOut(address factory, uint amountIn, Path[] memory path) internal view returns (uint[] memory amounts) {
-        amounts = new uint[](path.length + 1);
+    function getAmountsOut(address factory, uint amountIn, bytes memory path) internal view returns (uint[] memory amounts) {
+        uint numPools = path.numPools();
+        amounts = new uint[](numPools + 1);
         amounts[0] = amountIn;
-        for (uint i; i < path.length; i++) {
-            (uint reserveIn, uint reserveOut) = getReserves(factory, path[i].tokenIn, path[i].tokenOut, path[i].feeSwap);
-            amounts[i + 1] = getAmountOut(amounts[i], reserveIn, reserveOut, path[i].feeSwap);
+        for (uint i; i < numPools; i++) {
+            (address tokenIn, address tokenOut, uint16 feeSwap) = path.decodeFirstPool();
+            (uint reserveIn, uint reserveOut) = getReserves(factory, tokenIn, tokenOut, feeSwap);
+            amounts[i + 1] = getAmountOut(amounts[i], reserveIn, reserveOut, feeSwap);
+            if(i < numPools - 1) path = path.skipTokenFirst();
         }
     }
 
     // performs chained getAmountIn calculations on any number of pairs
-    function getAmountsIn(address factory, uint amountOut, Path[] memory path) internal view returns (uint[] memory amounts) {
-        amounts = new uint[](path.length + 1);
+    function getAmountsIn(address factory, uint amountOut, bytes memory path) internal view returns (uint[] memory amounts) {
+        uint numPools = path.numPools();
+        amounts = new uint[](numPools + 1);
         amounts[amounts.length - 1] = amountOut;
         for (uint i = path.length; i > 0; i--) {
-            (uint reserveIn, uint reserveOut) = getReserves(factory, path[i].tokenIn, path[i].tokenOut, path[i].feeSwap);
-            amounts[i - 1] = getAmountIn(amounts[i], reserveIn, reserveOut, path[i].feeSwap);
+            (address tokenIn, address tokenOut, uint16 feeSwap) = path.decodeLastPool();
+            (uint reserveIn, uint reserveOut) = getReserves(factory, tokenIn, tokenOut, feeSwap);
+            amounts[i - 1] = getAmountIn(amounts[i], reserveIn, reserveOut, feeSwap);
+            if(i > numPools - 1) path = path.skipTokenLast();
         }
     }
 }

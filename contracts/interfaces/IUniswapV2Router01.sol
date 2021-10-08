@@ -77,28 +77,28 @@ interface IUniswapV2Router01 {
     function swapExactTokensForTokens(
         uint amountIn,
         uint amountOutMin,
-        UniswapV2Library.Path[] calldata path,
+        bytes calldata path,
         address to,
         uint deadline
     ) external returns (uint[] memory amounts);
     function swapTokensForExactTokens(
         uint amountOut,
         uint amountInMax,
-        UniswapV2Library.Path[] calldata path,
+        bytes calldata path,
         address to,
         uint deadline
     ) external returns (uint[] memory amounts);
-    function swapExactETHForTokens(uint amountOutMin, UniswapV2Library.Path[] calldata path, address to, uint deadline)
+    function swapExactETHForTokens(uint amountOutMin, bytes calldata path, address to, uint deadline)
         external
         payable
         returns (uint[] memory amounts);
-    function swapTokensForExactETH(uint amountOut, uint amountInMax, UniswapV2Library.Path[] calldata path, address to, uint deadline)
+    function swapTokensForExactETH(uint amountOut, uint amountInMax, bytes calldata path, address to, uint deadline)
         external
         returns (uint[] memory amounts);
-    function swapExactTokensForETH(uint amountIn, uint amountOutMin, UniswapV2Library.Path[] calldata path, address to, uint deadline)
+    function swapExactTokensForETH(uint amountIn, uint amountOutMin, bytes calldata path, address to, uint deadline)
         external
         returns (uint[] memory amounts);
-    function swapETHForExactTokens(uint amountOut, UniswapV2Library.Path[] calldata path, address to, uint deadline)
+    function swapETHForExactTokens(uint amountOut, bytes calldata path, address to, uint deadline)
         external
         payable
         returns (uint[] memory amounts);
@@ -106,6 +106,6 @@ interface IUniswapV2Router01 {
     function quote(uint amountA, uint reserveA, uint reserveB) external pure returns (uint amountB);
     function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut, uint feeSwap) external pure returns (uint amountOut);
     function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut, uint feeSwap) external pure returns (uint amountIn);
-    function getAmountsOut(uint amountIn, UniswapV2Library.Path[] calldata path) external view returns (uint[] memory amounts);
-    function getAmountsIn(uint amountOut, UniswapV2Library.Path[] calldata path) external view returns (uint[] memory amounts);
+    function getAmountsOut(uint amountIn, bytes calldata path) external view returns (uint[] memory amounts);
+    function getAmountsIn(uint amountOut, bytes calldata path) external view returns (uint[] memory amounts);
 }
