@@ -117,8 +117,8 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
     ) public virtual ensure(deadline) returns (uint amountA, uint amountB) {
         address pair = UniswapV2Library.pairFor(factory, tokenA, tokenB, feeSwap);
         IUniswapV2Pair(pair).transferFrom(msg.sender, pair, liquidity); // send liquidity to pair
-        (uint amount0, uint amount1) = IUniswapV2Pair(pair).burn(to);
-        (amountA, amountB) = tokenA < tokenA ? (amount0, amount1) : (amount1, amount0);
+        (amountA, amountB) = IUniswapV2Pair(pair).burn(to);
+        (amountA, amountB) = tokenA < tokenB ? (amountA, amountB) : (amountB, amountA);
         require(amountA >= amountAMin, 'UniswapV2Router: INSUFFICIENT_A_AMOUNT');
         require(amountB >= amountBMin, 'UniswapV2Router: INSUFFICIENT_B_AMOUNT');
     }
@@ -226,8 +226,7 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
         for (uint i; i < numPools; i++) {
             (address tokenIn, address tokenOut, uint16 feeSwap) = path.decodeFirstPool();
             IUniswapV2Pair pair = IUniswapV2Pair(UniswapV2Library.pairFor(factory, tokenIn, tokenOut, feeSwap));
-            uint amountOut = amounts[i + 1];
-            (uint amount0Out, uint amount1Out) = tokenIn < tokenOut ? (uint(0), amountOut) : (amountOut, uint(0));
+            (uint amount0Out, uint amount1Out) = tokenIn < tokenOut ? (uint(0), amounts[i + 1]) : (amounts[i + 1], uint(0));
             address _to;
             if(i < numPools - 1) {
                 path = path.skipTokenFirst();
