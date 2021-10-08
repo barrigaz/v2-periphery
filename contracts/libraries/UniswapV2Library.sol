@@ -31,9 +31,8 @@ library UniswapV2Library {
 
     // fetches and sorts the reserves for a pair
     function getReserves(address factory, address tokenA, address tokenB, uint feeSwap) internal view returns (uint reserveA, uint reserveB) {
-        (address token0,) = sortTokens(tokenA, tokenB);
         IUniswapV2Pair.Reserves memory reserves = IUniswapV2Pair(pairFor(factory, tokenA, tokenB, feeSwap)).getReserves();
-        (reserveA, reserveB) = tokenA == token0 ? (reserves.reserve0, reserves.reserve1) : (reserves.reserve1, reserves.reserve0);
+        (reserveA, reserveB) = tokenA < tokenB ? (reserves.reserve0, reserves.reserve1) : (reserves.reserve1, reserves.reserve0);
     }
 
     // given some amount of an asset and pair reserves, returns an equivalent amount of the other asset
