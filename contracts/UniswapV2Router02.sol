@@ -229,7 +229,7 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
             (uint amount0Out, uint amount1Out) = tokenIn < tokenOut ? (uint(0), amounts[i + 1]) : (amounts[i + 1], uint(0));
             address _to;
             if(i < numPools - 1) {
-                path = path.skipTokenFirst();
+                path = path.skipFirstToken();
                 (, tokenIn, feeSwap) = path.decodeFirstPool();
                 _to = UniswapV2Library.pairFor(factory, tokenOut, tokenIn, feeSwap);
             } else {
@@ -361,7 +361,7 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
             (uint amount0Out, uint amount1Out) = tokenIn < tokenOut ? (uint(0), amountOutput) : (amountOutput, uint(0));
             address _to;
             if(i < numPools - 1) {
-                path = path.skipTokenFirst();
+                path = path.skipFirstToken();
                 (, tokenIn, feeSwap) = path.decodeFirstPool();
                 _to = UniswapV2Library.pairFor(factory, tokenOut, tokenIn, feeSwap);
             } else {

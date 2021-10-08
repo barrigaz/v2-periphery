@@ -70,7 +70,7 @@ library UniswapV2Library {
             (address tokenIn, address tokenOut, uint16 feeSwap) = path.decodeFirstPool();
             (uint reserveIn, uint reserveOut) = getReserves(factory, tokenIn, tokenOut, feeSwap);
             amounts[i + 1] = getAmountOut(amounts[i], reserveIn, reserveOut, feeSwap);
-            if(i < numPools - 1) path = path.skipTokenFirst();
+            if(i < numPools - 1) path = path.skipFirstToken();
         }
     }
 
@@ -83,7 +83,7 @@ library UniswapV2Library {
             (address tokenIn, address tokenOut, uint16 feeSwap) = path.decodeLastPool();
             (uint reserveIn, uint reserveOut) = getReserves(factory, tokenIn, tokenOut, feeSwap);
             amounts[i - 1] = getAmountIn(amounts[i], reserveIn, reserveOut, feeSwap);
-            if(i > numPools - 1) path = path.skipTokenLast();
+            if(i > numPools - 1) path = path.skipLastToken();
         }
     }
 }

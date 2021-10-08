@@ -65,14 +65,14 @@ library Path {
     /// @notice Skips a token + fee element from the buffer and returns the remainder
     /// @param path The swap path
     /// @return The remaining token + fee elements in the path
-    function skipTokenFirst(bytes memory path) internal pure returns (bytes memory) {
+    function skipFirstToken(bytes memory path) internal pure returns (bytes memory) {
         return path.slice(NEXT_OFFSET, path.length - NEXT_OFFSET);
     }
 
     /// @notice Skips a token + fee element from the buffer in reverse order and returns the remainder
     /// @param path The swap path
     /// @return The remaining token + fee elements in the path
-    function skipTokenLast(bytes memory path) internal pure returns (bytes memory) {
+    function skipLastToken(bytes memory path) internal pure returns (bytes memory) {
         return path.slice(0, path.length - NEXT_OFFSET);
     }
 }
