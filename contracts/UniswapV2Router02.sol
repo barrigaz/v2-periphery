@@ -227,19 +227,18 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
         for (uint i; i < numPools; i++) {
             (address tokenIn, address tokenOut, uint16 feeSwap) = path.decodeFirstPool();
             (address token0,) = UniswapV2Library.sortTokens(tokenIn, tokenOut);
+            IUniswapV2Pair pair = IUniswapV2Pair(UniswapV2Library.pairFor(factory, tokenIn, tokenOut, feeSwap));
             uint amountOut = amounts[i + 1];
             (uint amount0Out, uint amount1Out) = tokenIn == token0 ? (uint(0), amountOut) : (amountOut, uint(0));
             address _to;
             if(i < numPools - 1) {
                 path = path.skipTokenFirst();
-                (, address tokenOutNext, uint16 feeSwapNext) = path.decodeFirstPool();
-                _to = UniswapV2Library.pairFor(factory, tokenOut, tokenOutNext, feeSwapNext);
+                (, tokenIn, feeSwap) = path.decodeFirstPool();
+                _to = UniswapV2Library.pairFor(factory, tokenOut, tokenIn, feeSwap);
             } else {
                 _to = to;
             }
-            IUniswapV2Pair(UniswapV2Library.pairFor(factory, tokenIn, tokenOut, feeSwap)).swap(
-                amount0Out, amount1Out, _to, new bytes(0)
-            );
+            pair.swap(amount0Out, amount1Out, _to, new bytes(0));
         }
     }
     function swapExactTokensForTokens(
