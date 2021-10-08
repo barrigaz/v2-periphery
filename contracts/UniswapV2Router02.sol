@@ -118,8 +118,7 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
         address pair = UniswapV2Library.pairFor(factory, tokenA, tokenB, feeSwap);
         IUniswapV2Pair(pair).transferFrom(msg.sender, pair, liquidity); // send liquidity to pair
         (uint amount0, uint amount1) = IUniswapV2Pair(pair).burn(to);
-        (address token0,) = UniswapV2Library.sortTokens(tokenA, tokenB);
-        (amountA, amountB) = tokenA == token0 ? (amount0, amount1) : (amount1, amount0);
+        (amountA, amountB) = tokenA < tokenA ? (amount0, amount1) : (amount1, amount0);
         require(amountA >= amountAMin, 'UniswapV2Router: INSUFFICIENT_A_AMOUNT');
         require(amountB >= amountBMin, 'UniswapV2Router: INSUFFICIENT_B_AMOUNT');
     }
@@ -226,10 +225,9 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
         uint numPools = path.numPools();
         for (uint i; i < numPools; i++) {
             (address tokenIn, address tokenOut, uint16 feeSwap) = path.decodeFirstPool();
-            (address token0,) = UniswapV2Library.sortTokens(tokenIn, tokenOut);
             IUniswapV2Pair pair = IUniswapV2Pair(UniswapV2Library.pairFor(factory, tokenIn, tokenOut, feeSwap));
             uint amountOut = amounts[i + 1];
-            (uint amount0Out, uint amount1Out) = tokenIn == token0 ? (uint(0), amountOut) : (amountOut, uint(0));
+            (uint amount0Out, uint amount1Out) = tokenIn < tokenOut ? (uint(0), amountOut) : (amountOut, uint(0));
             address _to;
             if(i < numPools - 1) {
                 path = path.skipTokenFirst();
@@ -352,17 +350,16 @@ contract UniswapV2Router02 is IUniswapV2Router02 {
         uint numPools = path.numPools();
         for (uint i; i < numPools; i++) {
             (address tokenIn, address tokenOut, uint16 feeSwap) = path.decodeFirstPool();
-            (address token0,) = UniswapV2Library.sortTokens(tokenIn, tokenOut);
             IUniswapV2Pair pair = IUniswapV2Pair(UniswapV2Library.pairFor(factory, tokenIn, tokenOut, feeSwap));
             uint amountInput;
             uint amountOutput;
             { // scope to avoid stack too deep errors
             IUniswapV2Pair.Reserves memory reserves = pair.getReserves();
-            (uint reserveInput, uint reserveOutput) = tokenIn == token0 ? (reserves.reserve0, reserves.reserve1) : (reserves.reserve1, reserves.reserve0);
+            (uint reserveInput, uint reserveOutput) = tokenIn < tokenOut ? (reserves.reserve0, reserves.reserve1) : (reserves.reserve1, reserves.reserve0);
             amountInput = IERC20(tokenIn).balanceOf(address(pair)) - reserveInput;
             amountOutput = UniswapV2Library.getAmountOut(amountInput, reserveInput, reserveOutput, feeSwap);
             }
-            (uint amount0Out, uint amount1Out) = tokenIn == token0 ? (uint(0), amountOutput) : (amountOutput, uint(0));
+            (uint amount0Out, uint amount1Out) = tokenIn < tokenOut ? (uint(0), amountOutput) : (amountOutput, uint(0));
             address _to;
             if(i < numPools - 1) {
                 path = path.skipTokenFirst();
